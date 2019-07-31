@@ -1,0 +1,6 @@
+mysqlclient
+Django
+PyMySQL
+uWSGI
+djangorestframework
+django-rest-swagger
