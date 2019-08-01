@@ -94,7 +94,7 @@ class PingPongSerializer(serializers.Serializer):
 
 class PingPongSerializer は serializers.Serializer を継承しており、そこにある変数は ping という serializers.CharField 型のインスタンスです。
 
-CharField 型のインスタンスとは、つまりは短めのテキストの入力を期待しています。これに対して、長めのテキストについては TextField 型のインスタンスが適当とされています。一覧は Tipsの [Serializers 一覧](#Serializers 一覧)
+CharField 型のインスタンスとは、つまりは短めのテキストの入力を期待しています。これに対して、長めのテキストについては TextField 型のインスタンスが適当とされています。一覧は Tipsの [Serializers 一覧](#serializers-一覧)
 
 初期化引数にいろいろ書いてありますが、これの説明は省略します。なぜならばこの部分の詳しい話はセキュリティなどで割と重要になる部分なので、できる人にお願いしたほうが良いからです。
 
