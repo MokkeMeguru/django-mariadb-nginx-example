@@ -12,7 +12,7 @@
 
 * First. Run as only Django REST Framework (no docker-compose)
   - [[./docs/django-tutorials01.md][Django REST Framework Tutorials 1]]
-  - Django REST Framework Tutorials 2
+  - [[./docs/django-tutorials02.md][Django REST Framework Tutorials 2]]
   - Django REST Framwwork Tutorials 3
 
 
