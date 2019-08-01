@@ -157,11 +157,11 @@ urlpatterns = [
 以上で今回のチュートリアルは終了です。コーヒーでも飲んでリラックスしましょう。
 # Tips
 ## django-rest-swagger の廃止
-この ![issue](https://github.com/marcgibbons/django-rest-swagger/issues/808) からわかるように、django-rest-swagger はオワコンになりました。
+この [issue](https://github.com/marcgibbons/django-rest-swagger/issues/808) からわかるように、django-rest-swagger はオワコンになりました。
 
-代わりに ![drf-yasg](https://github.com/axnsan12/drf-yasg#quickstart) を使いましょう。
+代わりに [drf-yasg](https://github.com/axnsan12/drf-yasg#quickstart) を使いましょう。
 ## PyMySQL の Django 非対応について
-どうやら Django は PyMySQL の対応をしたくないらしい。少なくとも Django 2.2.1 では対応していなかった。https://docs.djangoproject.com/en/2.2/releases/2.2/ からもわかるように mysqlclient 推しのようだ。
+どうやら Django は PyMySQL の対応をしたくないらしいです。少なくとも Django 2.2.1 では対応していなかったです。https://docs.djangoproject.com/en/2.2/releases/2.2/ からもわかるように mysqlclient 推しの模様。
 
 同機能のライブラリを乱立させないで欲しい（切実）
 ## venv 環境ってOOO(エディタ名) でどう入るの？
