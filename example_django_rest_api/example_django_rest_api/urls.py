@@ -26,6 +26,8 @@ from rest_framework import routers
 from ping_pong import views
 from django.conf.urls import include
 
+from draft_todo import views as dview
+
 router = routers.SimpleRouter()
 router.register(r'ping', views.PingPongView, base_name='ping')
 
@@ -51,5 +53,6 @@ urlpatterns = [
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     url(r'ping', views.PingPongView.as_view(), name='ping'),
+    url(r'draft_user/create_user', dview.TaskUserCreateAPIView.as_view(), name='dcu'),
 ]
 

@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'livesync',
     'rest_framework',
-    'drf_yasg'
+    'drf_yasg',
+    'draft_todo.apps.DraftTodoConfig'
 ]
 
 MIDDLEWARE = [
