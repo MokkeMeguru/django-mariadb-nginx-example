@@ -6,6 +6,19 @@ volumes:
     external: true
   
 services:
+  # proxy (ルーティング等)
+  proxy:
+    # or apache
+    image: nginx:1.17.2
+    # TODO: ルーティングの設定
+    volumes:
+      - ./proxy/conf:/etc/nginx/conf.d
+      - ./proxy/uwsgi_params:/etc/nginx/uwsgi_params
+    depends_on:
+      - app
+    ports:
+      - "8000:8000"
+
   # DB
   db:
       # DB の image
@@ -46,16 +59,4 @@ services:
     depends_on:
       - db
 
-  # proxy (ルーティング等)
-  proxy:
-    # or apache
-    image: nginx:1.17.2
-    # TODO: ルーティングの設定
-    volumes:
-      - ./proxy/conf:/etc/nginx/conf.d
-      - ./proxy/uwsgi_params:/etc/nginx/uwsgi_params
-    links:
-      - app
-    ports:
-      - "8000:8000"
 
