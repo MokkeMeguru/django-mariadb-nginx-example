@@ -167,6 +167,9 @@ urlpatterns = [
 ## venv 環境ってOOO(エディタ名) でどう入るの？
 "OOO venv python" あたりで調べてください。 それでわからなければ、あなたにそのエディタは合わないんじゃないですかね。
 
+## `pip install -r requirement.txt`
+依存パッケージを保存したファイルからパッケージインストールを行う方法。
+
 # TODO
 ## `pip install mysqlclient` の実行
 mysqlclient はその実行環境下で mysql のインストールが必要なのでローカルで確認する際には邪魔
