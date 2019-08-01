@@ -1,3 +1,4 @@
+
 version: '3.4'
 
 volumes:
@@ -38,8 +39,8 @@ services:
     command: /src/run.sh
     volumes:
       - ./src:/src
-    # ports:
-    #   - 8000:8000
+    ports:
+      - "8001:8001"
     expose:
       - "8001"
     depends_on:
