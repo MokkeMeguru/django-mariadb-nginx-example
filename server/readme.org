@@ -10,13 +10,13 @@
 #+exclude_tags: noexport
 #+creator: Emacs 26.2 (Org mode 9.2.4)
 
-* First. Run as only Django Rest Framework (no docker-compose)
-  - [[./docs/django-tutorials01.md][Django Rest Framework Tutorials 1]]
-  - Django Rest Framework Tutorials 2
-  - Django Rest Framwwork Tutorials 3
+* First. Run as only Django REST Framework (no docker-compose)
+  - [[./docs/django-tutorials01.md][Django REST Framework Tutorials 1]]
+  - Django REST Framework Tutorials 2
+  - Django REST Framwwork Tutorials 3
 
 
 * Change Log
-** DONE Django Rest Framework Tutorials 1 [2019-08-02 Fri 01:03]
-** TODO  Django Rest Framework Tutorials 2
+** DONE Django REST Framework Tutorials 1 [2019-08-02 Fri 01:03]
+** DONE Django REST Framework Tutorials 2 [2019-08-02 Fri 05:52]
 

@@ -1,4 +1,4 @@
-# Django Rest Framework Tutorials 1
+# Django REST Framework Tutorials 1
 # What's this?
 Djangoで詰まって開発できねえ！というDjango初心者向けのFirst StepsとTips
 
@@ -6,7 +6,7 @@ Djangoで詰まって開発できねえ！というDjango初心者向けのFirst
 - Python > 3.6
 - Mac or Linux (recommend)
 
-# Preparation. venv 環境を作成する
+#  venv 環境を作成する
 ホストの環境を汚さないためにはPythonの仮想環境である venv を利用することが恐らく最も簡単な手段の一つです。
 
 ```shell
@@ -20,7 +20,7 @@ source venv/bin/activate
 
 "~$" -> "[venv] ~$" のようになります。逆に言えばこうなっていないと venv の環境に入れていません。
 
-# First. まずはプロジェクトを立ち上げる
+# まずはプロジェクトを立ち上げる
 ## パッケージのインストール & 確認
 venv 環境内で、まず今回扱うプロジェクトのための依存パッケージのインストールを行います。
 
@@ -128,7 +128,7 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Restful API Lists",
+      title="RESTful API Lists",
       default_version='v1',
       description="Django Rest Framework Swagger : First Steps",
       terms_of_service="https://github.com/MokkeMeguru",
