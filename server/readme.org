@@ -17,7 +17,6 @@
 
 
 * Change Log
-** DONE Django Rest Framework Tutorials 1
-CLOSED: [2019-08-02 Fri 01:03]
+** DONE Django Rest Framework Tutorials 1 [2019-08-02 Fri 01:03]
 ** TODO  Django Rest Framework Tutorials 2
 
