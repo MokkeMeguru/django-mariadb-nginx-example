@@ -4,3 +4,4 @@ PyMySQL
 uWSGI
 djangorestframework
 django-rest-swagger
+django-livesync
