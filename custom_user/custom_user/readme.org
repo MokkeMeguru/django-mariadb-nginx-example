@@ -1,0 +1,74 @@
+#+title: how to add custom user?
+
+* generate project
+#+begin_src shell
+  django-admin startproject mysite
+cd mysite
+django-admin startapp myapp
+#+end_src
+
+* edit some file
+以下のファイルを編集
+
+myuser.models.py
+
+#+begin_src python
+from django.db import models
+
+# Create your models here.
+from django.contrib.auth.models import AbstractUser
+
+class User(AbstractUser):
+    pass
+#+end_src
+
+myuser.admin.py
+
+#+begin_src python
+from django.contrib import admin
+
+# Register your models here.
+from django.contrib.auth.admin import UserAdmin
+from .models import User
+
+admin.site.register(User, UserAdmin)
+#+end_src
+
+settings.py
+
+#+begin_src python
+# ...
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'myuser'
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+AUTH_USER_MODEL='myuser.User'
+# ...
+#+end_src
+
+実行コマンドは次の通り
+
+#+begin_src
+python manage.py makemigrations myuser
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+#+end_src
