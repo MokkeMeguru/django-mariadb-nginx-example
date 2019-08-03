@@ -1,1 +1,1 @@
-
+from .authUser import AuthUser

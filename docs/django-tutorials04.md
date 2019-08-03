@@ -89,11 +89,13 @@ class User(models.Model):
 
 (本当はDBから消したかったのですが、それにはかなりのリファクタリングが必要なため諦めました)
 
+おそらく本番環境などでは、権限付きユーザを消した上で、createsuperuser 関数などを修正して絶対に権限付きユーザが作られないようにするとかしたほうが良いと思います。（頑張ると一般ユーザから権限付きユーザへいけるの、怖くないんですかね？）
+
 ```python
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin, AbstractBaseUser
-from django.contrib.auth.validators import (UnicodeUsernameValidator,
-                                            MinLengthValidator)
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.validators import MinLengthValidator
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import send_mail
@@ -123,10 +125,12 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser', True):
+        if extra_fields.get('is_superuser', True) is not True:
             raise ValueError('Superuser must have is_superuser=True')
+        return self._create_user(username, email, password, **extra_fields)
 
 
+# id cannot be removed since Too complex framework dependencies
 class AuthUser(AbstractBaseUser, PermissionsMixin):
     username_validator = UnicodeUsernameValidator()
     username = models.CharField(
@@ -139,13 +143,19 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
         error_messages={
             'unique': _("A user with that username already exists.")
         })
-    email = models.EmailField(_('email address'), blank=True)
-    # is_staff = models.BooleanField(
-    #     _('staff status'),
-    #     default=False,
-    #     help_text=_(
-    #         'Designates whether the user can log into this admin site.'),
-    # )
+    email = models.EmailField(_('email address'), blank=False)
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_(
+            'Designates whether the user can log into this admin site.'),
+    )
+    is_superuser = models.BooleanField(
+        _('superuser status'),
+        default=False,
+        help_text=_(
+            'Designates whether the user can log into this admin site.'),
+    )
     last_login = models.EmailField(_('email address'), blank=True)
     is_active = models.BooleanField(
         _('active'),
@@ -156,9 +166,12 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
+    first_name = models.CharField(default="", blank=True, max_length=1)
+    last_name = models.CharField(default="", blank=True, max_length=1)
+
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['username', 'email', 'password']
+    REQUIRED_FIELDS = ['email', 'password']
 
     class Meta:
         verbose_name = _('user')
@@ -177,8 +190,14 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 ```
-## AuthUser クラスを掘る
-まずは `http://localhost:8000/admin` 画面で編集できるように `admin.py` を編集します。
+
+次に、`models.__init__.py` を編集します。これは後で出てくる `settings.py` でちょっとしたエラーを回避するためです。
+
+```python
+from .authUser import AuthUser
+```
+
+次に `draft_todo/admin.py` を編集します。
 
 ```python
 from django.contrib import admin
@@ -187,33 +206,110 @@ from django.contrib import admin
 from .models.user import User
 from .models.todoItem import TodoItem
 from .models.authUser import AuthUser
-
+from django.contrib.auth.admin import UserAdmin
 
 admin.site.register(User)
 admin.site.register(TodoItem)
-admin.site.register(AuthUser)
+admin.site.register(AuthUser, UserAdmin)
 ```
 
+`AuthUser` があまり変更できなかった理由の一つに、この `UserAdmin` に関連した field を削除できなかったことがあります。
+
+最後に `settings.py` を編集します。
+
+```python
+# ...
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'livesync',
+    'rest_framework',
+    'drf_yasg',
+    'draft_todo.apps.DraftTodoConfig',
+]
+
+AUTH_USER_MODEL = 'draft_todo.AuthUser'
+
+# ...
+```
+
+`AUTH_USER_MODEL` に `AuthUser` を追加していますね。`draft_todo.AuthUser` 、つまり `<app_name>:<Model>`の形が大事です。これが`draft_todo.models.authUser.AuthUser'` であるとクソみたいなエラーが吐かれます。
+
+## AuthUser クラスを掘る
 次に AuthUser クラスを彫ります。
 
 ```shell
 python manage.py makemigrations draft_todo
-# SystemCheckError: System check identified some issues:
-#
-# ERRORS:
-# auth.User.groups: (fields.E304) Reverse accessor for 'User.groups' clashes with reverse accessor for 'AuthUser.groups'.
-# 	HINT: Add or change a related_name argument to the definition for 'User.groups' or 'AuthUser.groups'.
+python manage.py migrate
+python manage.py createsuperuser
 ```
+## admin 画面で見る
 
-エラーが出ましたね。ユーザ系のクラスを複数作ると大変、当然といえば当然ですね。
+![](./img/django-view-authuser.png)
 
-まず `settings.py` を編集します。
+確かに追加できることがわかりますね。
+## Serializer を作る
+`serializers.py` に次を追加します。
+
 ```python
 # ...
-STATIC_URL = '/static/'
+from draft_todo.models.authUser import AuthUser
 
-AUTH_USER_MODEL = 'draft_todo.models.authUser.AuthUser'
+# ...
+class TaskAuthUserSerializer(ModelSerializer):
+    class Meta:
+        model = AuthUser
+        fields = ['username', 'email', 'password']
 ```
+
+つまり `username` `email` `password` が必要になる、ということです。
+## 仮の View を作る
+`views.py` に次を追加します。
+
+```python
+# ...
+from rest_framework.viewsets import ModelViewSet
+from draft_todo.models.authUser import AuthUser
+from draft_todo.serializers import TaskAuthUserSerializer
+
+# ...
+class TaskAuthUserAPIView(ModelViewSet):
+    queryset = AuthUser.objects.all()
+    serializer_class = TaskAuthUserSerializer
+```
+
+今回は適当に沢山の(セキュリティ的にガバガバすぎる下痢便のような)APIを大量に放り出します。
+## URL に追加する
+ちょっとだけ変化がありますが、今回はこれ以上は紹介しません。詳しくは DefaultRouter のドキュメントを見てください。
+
+```python
+# ...
+from rest_framework import routers
+
+# ...
+router = routers.DefaultRouter()
+router.register(r'authuser', dview.TaskAuthUserAPIView)
+
+urlpatterns = [
+    # ...
+    path('draft_user/authuser',
+         include(router.urls),
+        name='da'),
+]
+```
+## Swagger で確認する
+
+![](./img/django-view-authuserapi.png)
+
+出るわ出るわAPIの山
+
+# AuthUser に紐付いたタスクを作る
+
+# AuthUser のログインが必要なAPIを作る
 # Tips
 ## そもそもなんでユーザと管理ユーザが等じ場所にあるんや
 システムメンテナンスには便利なんだろうけどわけわからん。

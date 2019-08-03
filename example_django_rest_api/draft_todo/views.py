@@ -9,6 +9,10 @@ from draft_todo.serializers import (TaskUserCreateSerializer,
 from rest_framework.response import Response
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+
+from rest_framework.viewsets import ModelViewSet
+from draft_todo.models.authUser import AuthUser
+from draft_todo.serializers import TaskAuthUserSerializer
 # Create your views here.
 
 
@@ -34,3 +38,8 @@ class TaskTodoItemListAPIView(ListAPIView):
 class TaskTodoItemRetrieveAPIView(RetrieveAPIView):
     queryset = TodoItem.objects.all()
     serializer_class = TaskTodoItemListSerializer
+
+
+class TaskAuthUserAPIView(ModelViewSet):
+    queryset = AuthUser.objects.all()
+    serializer_class = TaskAuthUserSerializer

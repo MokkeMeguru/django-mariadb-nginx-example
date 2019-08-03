@@ -4,8 +4,8 @@ from django.contrib import admin
 from .models.user import User
 from .models.todoItem import TodoItem
 from .models.authUser import AuthUser
+from django.contrib.auth.admin import UserAdmin
 
-
-admin.site.register(User, TodoItem, AuthUser)
-# admin.site.register(TodoItem)
-# admin.site.register(AuthUser)
+admin.site.register(User)
+admin.site.register(TodoItem)
+admin.site.register(AuthUser, UserAdmin)

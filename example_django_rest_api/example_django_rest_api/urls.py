@@ -39,6 +39,8 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(permissions.AllowAny, ),
 )
+router = routers.DefaultRouter()
+router.register(r'authuser', dview.TaskAuthUserAPIView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -65,4 +67,7 @@ urlpatterns = [
     path('draft_user/retrieve_task/<int:pk>',
         dview.TaskTodoItemRetrieveAPIView.as_view(),
         name='drt'),
+    path('draft_user/authuser',
+         include(router.urls),
+        name='da'),
 ]

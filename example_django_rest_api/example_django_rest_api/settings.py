@@ -39,9 +39,7 @@ INSTALLED_APPS = [
     'livesync',
     'rest_framework',
     'drf_yasg',
-    # 'draft_todo.apps.DraftTodoConfig',
-    'draft_todo',
-    # 'draft_todo.AuthUser'
+    'draft_todo.apps.DraftTodoConfig',
 ]
 
 AUTH_USER_MODEL = 'draft_todo.AuthUser'
