@@ -1,0 +1,1 @@
+from .myuser import MyUser
