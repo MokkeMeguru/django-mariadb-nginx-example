@@ -70,4 +70,7 @@ urlpatterns = [
     path('draft_user/authuser',
          include(router.urls),
         name='da'),
+    path('draft_authuser/create_task',
+         dview.TaskAuthUserCreateTodoItemAPIView.as_view(),
+        name='dact'),
 ]
