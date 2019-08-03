@@ -14,9 +14,12 @@
   - [[./docs/django-tutorials01.md][Django REST Framework Tutorials 1]]
   - [[./docs/django-tutorials02.md][Django REST Framework Tutorials 2]]
   - [[./docs/django-tutorials03.md][Django REST Framework Tutorials 3]]
-
+  - [[./docs/django-tutorials04.md][Django REST Framework Tutorials 4]]
+  - [[./docs/django-tutorials05.md][Django REST Framework Tutorials 5]]
 
 * Change Log
 ** DONE Django REST Framework Tutorials 1 [2019-08-02 Fri 01:03]
 ** DONE Django REST Framework Tutorials 2 [2019-08-02 Fri 05:52]
-** TODO Django REST Framework Tutorials 3
+** DONE Django REST Framework Tutorials 3 [2019-08-04 Sun 06:37]
+** DONE Django REST Framework Tutorials 4 [2019-08-04 Sun 06:38]
+** TODO Django REST Framework Tutorials 5
