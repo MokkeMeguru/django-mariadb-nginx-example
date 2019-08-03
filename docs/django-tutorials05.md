@@ -126,3 +126,8 @@ Swagger で確認すると、たしかにログイン時にタスクが追加あ
 # Tips
 ## LoginRequiredMixin を関数っぽく書くとどうなるの？
 (公式)[https://docs.djangoproject.com/en/2.2/topics/class-based-views/intro/#decorating-the-class] にあるように、`@method_decorator(login_required)` となります。
+
+
+# backlog
+
+この状態のデータは、このレポジトリの release v0.1.5 にあります。
