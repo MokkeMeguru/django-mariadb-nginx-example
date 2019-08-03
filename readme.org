@@ -22,4 +22,4 @@
 ** DONE Django REST Framework Tutorials 2 [2019-08-02 Fri 05:52]
 ** DONE Django REST Framework Tutorials 3 [2019-08-04 Sun 06:37]
 ** DONE Django REST Framework Tutorials 4 [2019-08-04 Sun 06:38]
-** TODO Django REST Framework Tutorials 5
+** DONE Django REST Framework Tutorials 5 [2019-08-04 Sun 08:26]
