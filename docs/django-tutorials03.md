@@ -566,3 +566,8 @@ Time: 0.013s
 両者の違いは `url` の場合は正規表現を用いてURLからデータをパースしており、`path` ではもうちょっとふわっとデータをパースしている、という点です。
 
 例えば、`path` での `draft_user/retrieve_task/<int:pk>`は `url` では `^draft_user/retrieve_task/(?P<int:pk>.+)` みたいにする必要があります。*どっちが良いのかは、私にもわからん。*
+
+
+# backlog
+
+この状態のデータは、このレポジトリの release v0.1.3 にあります。
