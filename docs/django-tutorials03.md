@@ -58,20 +58,22 @@ from django.core.validators import MinLengthValidator
 
 # Create your models here.
 class User(models.Model):
-    nickname = models.CharField(max_length=30, validators=[MinLengthValidator(5)], unique=True)
+    nickname = models.CharField(max_length=30, validators=[MinLengthValidator(5)], unique=True, primry_key=True)
     email = models.EmailField()
 
     def __str__(self):
         return "{}-{}".format(self.nickname, self.email)
 
 class TodoItem(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey('User',
+                              on_delete=models.CASCADE)
     todo_name = models.CharField(max_length=100)
     todo_text = models.TextField(blank=True, null=True)
     dead_line = models.DateTimeField()
     raise_date = models.DateTimeField(auto_now_add=True)
     importance = models.IntegerField(null=True)
     close_date = models.DateTimeField(blank=True, null=True)
+
     def __str__(self):
         return "{}-{}".format(self.owner, self.todo_name)
 
@@ -81,13 +83,13 @@ class TodoItem(models.Model):
 
 基本的にはSQLをPython っぽく書けば良いだけです。ただし models.Model を継承する必要があります。
 
-User は ユーザ名とメールアドレスを保存するためのテーブルです。ユーザ名は unique にしたかったので、引数に unique=True 制約を加えています。
+User は ユーザ名とメールアドレスを保存するためのテーブルです。ユーザ名は unique にしたかったので、引数に unique=True 制約を加えています。またユーザ名を primary_key にしています。
 
 XXField って何？って思うかもしれませんが、名前からなんとかなくXXのためのフィールドなんだなって思ってください。たくさん種類があるので、定義ジャンプやドキュメントから自分の使いたいものを探すと良いでしょう。
 
-
 TodoItem は owner がユーザに対して many to one な関係です。なので、models.ForeignKey を使ってつなげています。 `on_delete = models.CASCADE` はユーザが消えたときの処理で、今回は関連する TodoItem をすべて消します。
 
+また raise_date はタスクの生成日時を持っていて欲しいので、`auto_now_add=True` としています。これでユーザからの入力ではなく、Djangoの機能を使って自動的に日付を入力することができます。
 
 # モデルをマイグレートする
 DjangoのDjangoな点は、モデルがそのままデータベースにぶっ飛んでいくところです。
@@ -170,8 +172,6 @@ python manage.py shell
 ```text
 >>> user1  = User(nickname="mokkemeguru", email="meguru.mokke@gmail.com")
 >>> user1.save()
->>> user1.id
-1
 >>> user1.nickname
 'mokkemeguru'
 >>> user1.email
@@ -268,18 +268,6 @@ class TaskUserCreateSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ['nickname', 'email']
-
-
-class TaskTodoItemCreateSerializer(ModelSerializer):
-    class Meta:
-        model = TodoItem
-        fields = [
-            'owner',
-            'todo_name',
-            'todo_text',
-            'dead_line'
-        ]
-
 ```
 
 ## View を作る
@@ -299,9 +287,39 @@ from draft_todo.serializers import TaskUserCreateSerializer, TaskTodoItemCreateS
 class TaskUserCreateAPIView(CreateAPIView):
     queryset = User.objects.all()
     serializer_class = TaskUserCreateSerializer
-
 ```
-## Swagger で確認する。
+## URL に追加する
+`urls.py` に作った View を追加し、ルーティングを行います。
+
+```python
+from django.contrib import admin
+# ...
+from draft_todo import views as dview
+
+schema_view = get_schema_view(
+# ...
+)
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    url(r'^swagger/$',
+        schema_view.with_ui('swagger', cache_timeout=0),
+        name='schema-swagger-ui'),
+    url(r'^redoc/$',
+        schema_view.with_ui('redoc', cache_timeout=0),
+        name='schema-redoc'),
+    url(r'^redoc/$',
+        schema_view.with_ui('redoc', cache_timeout=0),
+        name='schema-redoc'),
+    url(r'ping', views.PingPongView.as_view(), name='ping'),
+    # add a below element
+    url(r'draft_user/create_user',
+        dview.TaskUserCreateAPIView.as_view(),
+        name='dcu'),
+]
+```
+## Swagger で確認する
 
 Swagger で追加
 ![](./img/django-add-user.png)
@@ -309,4 +327,242 @@ Swagger で追加
 Django Admin で確認
 ![](./img/django-add-user-res.png)
 
-# TODO 続き
+# タスクを作る
+## Serializer を作る
+Serializer を作ります。`draft_todo/serializer.py` を編集します。ユーザ追加の場合とほとんど変わりませんね。
+
+入力のバリデーションなんかを考えずに作っているので、とても簡単ですね。
+
+```python
+from rest_framework.serializers import ModelSerializer
+from draft_todo.models import User, TodoItem
+
+
+# ...
+
+# add a below class
+class TaskTodoItemCreateSerializer(ModelSerializer):
+    class Meta:
+        model = TodoItem
+        fields = [
+            'owner',
+            'todo_name',
+            'todo_text',
+            'dead_line'
+        ]
+```
+
+注意しなければならない点として、このSerializer ではすべての Model のフィールドを用いていない、という点です。例えば `raise_date` はユーザに入力されることを想定していないので、`fields` に含まれていません。
+## View を作る
+こちらもユーザを追加する場合とほとんど変わりません。
+
+```python
+from django.shortcuts import render
+
+from rest_framework.generics import CreateAPIView
+from draft_todo.models import User, TodoItem
+from draft_todo.serializers import TaskUserCreateSerializer, TaskTodoItemCreateSerializer
+# Create your views here.
+
+
+# ...
+
+# add a below class
+class TaskTodoItemCreateAPIView(CreateAPIView):
+    queryset = TodoItem.objects.all()
+    serializer_class = TaskTodoItemCreateSerializer
+```
+
+## URL に追加する
+こちらも同様です。`urls.py` を編集しましょう。
+
+```python
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    url(r'^swagger/$',
+        schema_view.with_ui('swagger', cache_timeout=0),
+        name='schema-swagger-ui'),
+    url(r'^redoc/$',
+        schema_view.with_ui('redoc', cache_timeout=0),
+        name='schema-redoc'),
+    url(r'^redoc/$',
+        schema_view.with_ui('redoc', cache_timeout=0),
+        name='schema-redoc'),
+    url(r'ping', views.PingPongView.as_view(), name='ping'),
+    url(r'draft_user/create_user',
+        dview.TaskUserCreateAPIView.as_view(),
+        name='dcu'),
+    url(r'draft_user/create_task',
+        )
+    url(r'draft_user/create_task',
+        dview.TaskTodoItemCreateAPIView.as_view(),
+        name='dct'),
+]
+```
+
+## Swagger で確認する
+
+Swagger で追加
+![](./img/django-add-task.png)
+
+Django Admin で確認
+![](./img/django-add-task-res.png)
+
+# タスクを一覧する
+ここでいうタスクとは、終了していないタスクのことです。なのでちょっと面倒くさいことをしないといけません。。
+
+## Serializer を作る
+同様に `serializers.py` に書き足しましょう。
+
+```python
+from rest_framework.serializers import ModelSerializer
+from draft_todo.models import User, TodoItem
+
+# ...
+
+class TaskTodoItemListSerializer(ModelSerializer):
+    class Meta:
+        model = TodoItem
+        fields = ['owner', 'todo_name', 'todo_text', 'dead_line', 'raise_date']
+```
+
+## View を作る
+ここらへんで勘の良い人は、あら？と思うと思います。
+
+```python
+from django.shortcuts import render
+
+from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework import viewsets
+from draft_todo.models import User, TodoItem
+from draft_todo.serializers import (TaskUserCreateSerializer,
+                                    TaskTodoItemCreateSerializer,
+                                    TaskTodoItemListSerializer)
+from drf_yasg import openapi
+# Create your views here.
+
+# ...
+
+class TaskTodoItemListAPIView(ListAPIView):
+    queryset = TodoItem.objects.all()
+    serializer_class = TaskTodoItemListSerializer
+```
+## URL に追加する
+
+```python
+# ...
+
+urlpatterns = [
+    # ...
+    url(r'draft_user/list_task/',
+        dview.TaskTodoItemListAPIView.as_view(),
+        name='dlt'),
+]
+```
+## Swagger で確認する
+
+プライバシーのプの字もないゴミのようなAPIを非常に簡単に作れてしまいました。
+
+Swagger で追加
+![](./img/django-list-task.png)
+
+## 注意
+そもそもこのような `ListAPIView` なんかは、汎用クラスViewと呼ばれており、例えばタスクを一覧するなどの場合では継承して詳しい実装をしないとあんまり役に立ちません。
+
+ただし詳しい実装をしようとすると `drf_ yapf` の対応していない関数 (get_queryset 、お前のことだよ)があったりするので正直やりたくないです。
+
+# タスクを１件表示する
+上では消化不良なので、もう一つ汎用クラスビューを紹介します。
+
+## View を作る
+
+```python
+class TaskTodoItemRetrieveAPIView(RetrieveAPIView):
+    queryset = TodoItem.objects.all()
+    serializer_class = TaskTodoItemListSerializer
+```
+## URL に追加する
+```python
+urlpatterns = [
+    # ...
+    path('draft_user/retrieve_task/<int:pk>',
+        dview.TaskTodoItemRetrieveAPIView.as_view(),
+        name='drt'),
+]
+```
+
+## Swager で確認する
+![](./img/django-detail-task.png)
+
+# タスクを一覧する ver. 2
+先程のアレではDjangoをゴミと言われてしまっても文句は言えないでしょう。そんなわけで便利にしましょう。
+## View の修正
+```python
+class TaskTodoItemListAPIView(ListAPIView):
+    # queryset = TodoItem.objects.all()
+    serializer_class = TaskTodoItemListSerializer
+
+    def get_queryset(self):
+        owner = self.kwargs['owner']
+        return TodoItem.objects.filter(owner=owner)
+```
+
+なんかメソッドが増えましたね。`get_queryset` とは返り値に `queryset` 型のインスタンスを受け取ります。例えばデータ全体を名前でフィルタリングして値を返したい場合などで役に立ちます。
+
+今回もその例にもれず、タスクの `owner` でフィルタリングしたものを返り値としています。
+
+`kwargs` とは後で触れる `urls.py` で与えられる引数です。
+
+## URL の修正
+前の章でわけのわかんねぇことを言っていますし、早速修正しましょう。
+
+```python
+urlpatterns = [
+    # ...
+    
+    path(r'draft_user/list_task/<str:owner>',
+        dview.TaskTodoItemListAPIView.as_view(),
+        name='dlt'),
+    # ...
+]
+```
+
+ここの `<str:owner>` にご注目。これは *string 型の値を受け取りそれをowner というキーに結びつける* ことを意味しています。これで前の章の意味がわかりましたね。
+## Swagger で確認する
+![](./img/django-list-task-by-user.png)
+
+[reference: 公式](https://www.django-rest-framework.org/api-guide/filtering/)
+# Tips
+## SQLite3 からデータベースを見たいとき
+`pip install litecli` で保管機能付きの環境を得ることができます。
+
+実行例
+```text
+$ litecli db.sqlite3 
+
+db.sqlite3> .tables                                                                                      
++----------------------------+
+| name                       |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| draft_todo_todoitem        |
+| draft_todo_user            |
++----------------------------+
+Time: 0.013s
+```
+
+## URL? PATH?
+`urls.py` で、`path` と `url` の2種類が `urlpatterns` へと追加されていると思われませんでしたか？
+両者の違いは `url` の場合は正規表現を用いてURLからデータをパースしており、`path` ではもうちょっとふわっとデータをパースしている、という点です。
+
+例えば、`path` での `draft_user/retrieve_task/<int:pk>`は `url` では `^draft_user/retrieve_task/(?P<int:pk>.+)` みたいにする必要があります。*どっちが良いのかは、私にもわからん。*

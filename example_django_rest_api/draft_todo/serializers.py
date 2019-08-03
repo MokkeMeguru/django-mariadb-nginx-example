@@ -11,9 +11,10 @@ class TaskUserCreateSerializer(ModelSerializer):
 class TaskTodoItemCreateSerializer(ModelSerializer):
     class Meta:
         model = TodoItem
-        fields = [
-            'owner',
-            'todo_name',
-            'todo_text',
-            'dead_line'
-        ]
+        fields = ['owner', 'todo_name', 'todo_text', 'dead_line']
+
+
+class TaskTodoItemListSerializer(ModelSerializer):
+    class Meta:
+        model = TodoItem
+        fields = ['owner', 'todo_name', 'todo_text', 'dead_line', 'raise_date']

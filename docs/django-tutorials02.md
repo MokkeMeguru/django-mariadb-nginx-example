@@ -155,9 +155,6 @@ from rest_framework import routers
 from ping_pong import views
 from django.conf.urls import include
 
-router = routers.SimpleRouter()
-router.register(r'ping', views.PingPongView, base_name='ping')
-
 # schema_view = get_schema_view(
 # ...
 # ...
