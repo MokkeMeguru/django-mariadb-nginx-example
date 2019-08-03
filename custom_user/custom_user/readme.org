@@ -1,5 +1,7 @@
 #+title: how to add custom user?
 
+* info
+  階層的なmodels へ対応することができました。このレポジトリは間もなく削除されます。
 * generate project
 #+begin_src shell
   django-admin startproject mysite
