@@ -246,3 +246,8 @@ serializer_field_mapping = {
         models.FilePathField: FilePathField,
     }
 ```
+
+
+# backlog
+
+この状態のデータは、このレポジトリの release v0.1.2 にあります。
