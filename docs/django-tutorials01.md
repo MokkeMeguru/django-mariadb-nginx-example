@@ -183,3 +183,6 @@ REST_FRAMEWORK = {
 }
 ```
 
+# backlog
+
+この状態のデータは、このレポジトリの release v0.1.1 にあります。
