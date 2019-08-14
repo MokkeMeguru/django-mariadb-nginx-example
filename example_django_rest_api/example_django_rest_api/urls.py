@@ -26,6 +26,7 @@ from rest_framework import routers
 from ping_pong import views
 
 from draft_todo import views as dview
+import rest_auth
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -67,10 +68,11 @@ urlpatterns = [
     path('draft_user/retrieve_task/<int:pk>',
         dview.TaskTodoItemRetrieveAPIView.as_view(),
         name='drt'),
-    path('draft_user/authuser',
+    path('draft_user/authuser/',
          include(router.urls),
         name='da'),
     path('draft_authuser/create_task',
          dview.TaskAuthUserCreateTodoItemAPIView.as_view(),
         name='dact'),
+    path('rest-auth/', include('rest_auth.urls'))
 ]

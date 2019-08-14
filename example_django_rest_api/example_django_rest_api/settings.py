@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'draft_todo.apps.DraftTodoConfig',
+    'rest_framework.authtoken'
 ]
 
 AUTH_USER_MODEL = 'draft_todo.AuthUser'
