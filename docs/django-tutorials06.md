@@ -33,6 +33,8 @@ INSTALLED_APPS = [
 #...
 ```
 
+urls.py
+
 ```python:urls.py
 # ...
 import rest_auth
