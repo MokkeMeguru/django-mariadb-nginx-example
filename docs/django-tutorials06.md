@@ -1,4 +1,4 @@
-# Django REST Framework Tutorials 5
+# Django REST Framework Tutorials 6
 # Requirement
 - Python > 3.6
 - Mac or Linux (recommend)
