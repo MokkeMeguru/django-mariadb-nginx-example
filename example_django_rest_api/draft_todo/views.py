@@ -18,6 +18,8 @@ from draft_todo.models.todoItemAsAuth import TodoItemAsAuth
 from draft_todo.serializers import TaskAuthAsAuthUserCreateSerializer
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from rest_framework.decorators import api_view
+from rest_framework import status
 # Create your views here.
 
 
@@ -56,3 +58,8 @@ class TaskAuthUserCreateTodoItemAPIView(LoginRequiredMixin, CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+@api_view(['GET'])
+def not_authorized(request):
+    return Response(status=status.HTTP_401_UNAUTHORIZED , data='NotAuthenticated')

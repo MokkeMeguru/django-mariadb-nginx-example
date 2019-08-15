@@ -74,5 +74,6 @@ urlpatterns = [
     path('draft_authuser/create_task',
          dview.TaskAuthUserCreateTodoItemAPIView.as_view(),
         name='dact'),
-    path('rest-auth/', include('rest_auth.urls'))
+    path('rest-auth/', include('rest_auth.urls')),
+    path('accounts/login/', dview.not_authorized)
 ]

@@ -77,6 +77,42 @@ admin から Tokens を確認してみましょう。
 
 ![](./img/django-admin-tasks.png)
 
+# `accounts/login` を実装する
+ログインしていない状況でタスクを追加しようとしたらどうなるでしょう？ `LoginRequiredMixin` は簡単な解決策として `accounts/login` へページを遷移させようとします。
+
+これは rest framework としては大変うれしくない仕様です。よってこれを上書きしましょう。
+
+```python:draft_todo/views.py
+# ...
+from rest_framework.decorators import api_view
+from rest_framework import status
+
+
+# ...
+@api_view(['GET'])
+def not_authorized(request):
+    return Response(status=status.HTTP_401_UNAUTHORIZED , data='NotAuthenticated')
+```
+
+```python:urls.py
+# ...
+
+urlpatterns = [
+    # ...
+    path('accounts/login/', dview.not_authorized)
+]
+```
+
+これは Get method で `accounts/login/` へアクセスがあったら、何がなんでも 401 コード(お前ログインできてねーよ)を返すAPIです。
+
+ところでこいつは今までのAPIの書き方とは違って、何やら関数っぽいですよね。これは Django の View の書き方がもう一つ、関数ベースの定義方法です。~~これがあるからDjangoはチーム開発したくないんだ~~ 
+
+@ api_view で、get メソッドの関数であることを示しています。後は関数なのでわかって下さい。そうでないならPythonに慣れていないかもしれないので、別言語を用いて RESTful API 開発して下さい。
+
+Swagger で確認をすると、次のようになっています。
+
+![](./img/django-rest-login-fail.png)
+
 # Next Step？
 とりあえずこれだけ動けば後は気持ちで解決できると思います。
 なにか問題があればレポジトリの issue を立てて下さい。
