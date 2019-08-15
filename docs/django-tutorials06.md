@@ -129,4 +129,4 @@ Django Rest Framework では [この一覧](https://www.django-rest-framework.or
 
 # backlog
 
-この状態のデータは、このレポジトリの release v0.1.5 にあります。
+この状態のデータは、このレポジトリの release v0.1.6 にあります。
