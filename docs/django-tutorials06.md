@@ -11,6 +11,8 @@
 pip install django-rest-auth
 ```
 
+settings.py
+
 ```python:settings.py
 # ...
 
