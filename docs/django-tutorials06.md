@@ -82,6 +82,7 @@ admin から Tokens を確認してみましょう。
 
 これは rest framework としては大変うれしくない仕様です。よってこれを上書きしましょう。
 
+draft_todo/views.py
 ```python:draft_todo/views.py
 # ...
 from rest_framework.decorators import api_view
@@ -94,6 +95,7 @@ def not_authorized(request):
     return Response(status=status.HTTP_401_UNAUTHORIZED , data='NotAuthenticated')
 ```
 
+urls.py
 ```python:urls.py
 # ...
 
